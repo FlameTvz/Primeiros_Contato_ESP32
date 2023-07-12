@@ -33,6 +33,7 @@ void loop() {
 
 
   //o Botao esta como PULLDOWN, por isso começar com HIGH
+
   if (digitalRead(bot1) == HIGH) {
     if (Flag_Botao == false) {
       delay(100);  // Aguarda um curto período para evitar leituras falsas
@@ -92,35 +93,54 @@ void loop() {
     Trata_Botao2 = 1;
   }
 
+
+  
   delay(100);
+
 }
 
 
-void controlleds(int potana) {
+void controlleds(int potana) 
+{
   int porcentagem = map(potana, 0, 4095, 0, 100);
   delay(50);
-  if (Flag_Botao2 == 1){
-  if (!Flag_Botao) {
-    digitalWrite(led1, porcentagem >= 25 && porcentagem < 50);
-    digitalWrite(led2, porcentagem >= 50 && porcentagem < 75);
-    digitalWrite(led3, porcentagem >= 75);
-  } else {
-    digitalWrite(led3, porcentagem >= 10 && porcentagem < 80);
-    digitalWrite(led2, porcentagem >= 80 && porcentagem < 90);
-    digitalWrite(led1, porcentagem >= 90);
+   
+   
+   if (digitalRead(bot1) == HIGH && digitalRead(bot2) == HIGH) {
+    digitalWrite(led1, HIGH);
+    digitalWrite(led2, HIGH);
+    digitalWrite(led3, HIGH);
+    //bota o pisca
+  }else{
+    if (Flag_Botao2 == 1){
+    if (!Flag_Botao) 
+    {
+      digitalWrite(led1, porcentagem >= 25 && porcentagem < 50);
+      digitalWrite(led2, porcentagem >= 50 && porcentagem < 75);
+      digitalWrite(led3, porcentagem >= 75);
+    }   else 
+    {
+      digitalWrite(led3, porcentagem >= 25 && porcentagem < 50);
+      digitalWrite(led2, porcentagem >= 50 && porcentagem < 75);
+      digitalWrite(led1, porcentagem >= 75);
+    }
   }
-  }
-  else{
-    if(!Flag_Botao)
+    else
+  {
+      if(!Flag_Botao)
     {
       digitalWrite(led1, porcentagem >= 25);
       digitalWrite(led2, porcentagem >= 50);
       digitalWrite(led3, porcentagem >= 75);
-  }
-  else{
+    }
+    else
+    {
       digitalWrite(led1, porcentagem >= 75);
       digitalWrite(led2, porcentagem >= 50);
       digitalWrite(led3, porcentagem >= 25);
+    }
   }
-  }
+    
+ }
 }
+
