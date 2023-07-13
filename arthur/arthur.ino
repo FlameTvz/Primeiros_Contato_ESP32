@@ -1,15 +1,19 @@
-const int pot = 34;                 // potenciomentro
-const int led1 = 2;                 // LEDs
-const int led2 = 15;                // LEDs
-const int led3 = 12;                // LEDs
-const int bot1 = 13;                // Botão
-const int bot2 = 22;                // Botão2
-unsigned char invertordem = false;  // Variável para controlar a inversão da ordem dos LEDs
+const int pot = 34;                  // potenciomentro
+const int led1 = 2;                  // LEDs
+const int led2 = 15;                 // LEDs
+const int led3 = 12;                 // LEDs
+const int bot1 = 13;                 // Botão
+const int bot2 = 22;                 // Botão2
+unsigned char invertordem = false;   // Variável para controlar a inversão da ordem dos LEDs
 unsigned char invertordem2 = false;  // Variável para controlar a inversão da ordem dos LEDs 2
-unsigned char Trata_Botao = 0;      // Tratamento do Botão
+unsigned char Trata_Botao = 0;       // Tratamento do Botão
 unsigned char Trata_Botao2 = 0;      // Tratamento do Botão2
-unsigned char Flag_Botao = 0;       // Flag do Botão
-unsigned char Flag_Botao2 = 0;      // Flag do Botão2
+unsigned char Trata_Botao3 = 0;
+unsigned char Flag_Botao = 0;   // Flag do Botão
+unsigned char Flag_Botao2 = 0;  // Flag do Botão2
+unsigned char Flag_Botao3 = 0;
+unsigned long tempo_anterior = 0;
+unsigned long intervalo = 100;
 
 
 
@@ -25,11 +29,11 @@ void setup() {
 }
 
 void loop() {
-  delay(10);
   int potana = analogRead(pot);         // Potenciometro Analogico
   int estadobotao = digitalRead(bot1);  //
   // outro_modo(potana);                   // Novo modo de acender os LEDs
-  controlleds(potana);                  // Funçao de Controlar os LEDs
+  controlleds(potana);  // Funçao de Controlar os LEDs
+
 
 
   //o Botao esta como PULLDOWN, por isso começar com HIGH
@@ -37,30 +41,17 @@ void loop() {
   if (digitalRead(bot1) == HIGH) {
     if (Flag_Botao == false) {
       delay(100);  // Aguarda um curto período para evitar leituras falsas
-      if(digitalRead(bot1) == HIGH)
-      Flag_Botao = true;  //
+      if (digitalRead(bot1) == HIGH)
+        Flag_Botao = true;  //
     }
 
   } else {
     if (Flag_Botao == true) {
       delay(100);
       if (digitalRead(bot1) == HIGH)
-      Flag_Botao = false;
+        Flag_Botao = false;
     }
     // delay(100);
-  }
-
-  if (Flag_Botao) {
-    if (Trata_Botao) {
-      if (invertordem)
-        invertordem = 0;
-      else
-        invertordem = 1;
-      Trata_Botao = 0;
-    }
-
-  } else {
-    Trata_Botao = 1;
   }
 
 
@@ -80,67 +71,65 @@ void loop() {
     // delay(100);
   }
 
-  if (Flag_Botao2) {
-    if (Trata_Botao2) {
-      if (invertordem2)
-        invertordem2 = 0;
-      else
-        invertordem2 = 1;
-      Trata_Botao2 = 0;
-    }
-
-  } else {
-    Trata_Botao2 = 1;
-  }
 
 
-  
+
+
+  //Botao 3
+
   delay(100);
-
 }
 
 
-void controlleds(int potana) 
-{
+void controlleds(int potana) {
   int porcentagem = map(potana, 0, 4095, 0, 100);
   delay(50);
-   
-   
-   if (digitalRead(bot1) == HIGH && digitalRead(bot2) == HIGH) {
-    digitalWrite(led1, HIGH);
-    digitalWrite(led2, HIGH);
-    digitalWrite(led3, HIGH);
-    //bota o pisca
-  }else{
-    if (Flag_Botao2 == 1){
-    if (!Flag_Botao) 
-    {
-      digitalWrite(led1, porcentagem >= 25 && porcentagem < 50);
-      digitalWrite(led2, porcentagem >= 50 && porcentagem < 75);
-      digitalWrite(led3, porcentagem >= 75);
-    }   else 
-    {
-      digitalWrite(led3, porcentagem >= 25 && porcentagem < 50);
-      digitalWrite(led2, porcentagem >= 50 && porcentagem < 75);
-      digitalWrite(led1, porcentagem >= 75);
-    }
-  }
-    else
-  {
-      if(!Flag_Botao)
-    {
-      digitalWrite(led1, porcentagem >= 25);
-      digitalWrite(led2, porcentagem >= 50);
-      digitalWrite(led3, porcentagem >= 75);
-    }
-    else
-    {
-      digitalWrite(led1, porcentagem >= 75);
-      digitalWrite(led2, porcentagem >= 50);
-      digitalWrite(led3, porcentagem >= 25);
-    }
-  }
-    
- }
-}
 
+
+  if ((digitalRead(bot1) == HIGH && digitalRead(bot2) == HIGH)) {
+    if (Flag_Botao3 == 0) {
+      delay(100);
+
+      if (digitalRead(bot1) == HIGH && digitalRead(bot2) == HIGH) {
+        Flag_Botao3 = 0;
+      }
+    }
+    Flag_Botao3 = 1;
+    //bota o pisca
+  } else {
+    if (Flag_Botao2 == 1) {
+      if (!Flag_Botao) {
+        digitalWrite(led1, porcentagem >= 25 && porcentagem < 50);
+        digitalWrite(led2, porcentagem >= 50 && porcentagem < 75);
+        digitalWrite(led3, porcentagem >= 75);
+        desliga();
+      } else {
+        digitalWrite(led3, porcentagem >= 25 && porcentagem < 50);
+        digitalWrite(led2, porcentagem >= 50 && porcentagem < 75);
+        digitalWrite(led1, porcentagem >= 75);
+        desliga();
+      }
+    } else {
+      if (!Flag_Botao) {
+        digitalWrite(led1, porcentagem >= 25);
+        digitalWrite(led2, porcentagem >= 50);
+        digitalWrite(led3, porcentagem >= 75);
+        desliga();
+      } else {
+        digitalWrite(led1, porcentagem >= 75);
+        digitalWrite(led2, porcentagem >= 50);
+        digitalWrite(led3, porcentagem >= 25);
+        desliga();
+      }
+    }
+  }
+}
+void desliga(void) {
+  if (Flag_Botao3 == 1) {
+    delay(intervalo);
+    digitalWrite(led1, LOW);
+    digitalWrite(led2, LOW);
+    digitalWrite(led3, LOW);
+    delay(intervalo);
+  }
+}
